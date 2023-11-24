@@ -6,17 +6,8 @@ import 'package:quote_repository/src/mappers/mappers.dart';
 import 'package:quote_repository/src/quote_local_storage.dart';
 
 class QuoteRepository {
-  QuoteRepository({
-    required KeyValueStorage keyValueStorage,
-    required this.remoteApi,
-    @visibleForTesting QuoteLocalStorage? localStorage,
-  }) : _localStorage = localStorage ??
-            QuoteLocalStorage(
-              keyValueStorage: keyValueStorage,
-            );
 
-  final FavQsApi remoteApi;
-  final QuoteLocalStorage _localStorage;
+  // TODO: Add constructor and data sources properties.
 
   Stream<QuoteListPage> getQuoteListPage(
     int pageNumber, {
@@ -25,86 +16,7 @@ class QuoteRepository {
     String? favoritedByUsername,
     required QuoteListPageFetchPolicy fetchPolicy,
   }) async* {
-    final isFilteringByTag = tag != null;
-    final isSearching = searchTerm.isNotEmpty;
-    final isFetchPolicyNetworkOnly =
-        fetchPolicy == QuoteListPageFetchPolicy.networkOnly;
-// 1
-    final shouldSkipCacheLookup =
-        isFilteringByTag || isSearching || isFetchPolicyNetworkOnly;
-    if (shouldSkipCacheLookup) {
-// 2
-      final freshPage = await _getQuoteListPageFromNetwork(
-        pageNumber,
-        tag: tag,
-        searchTerm: searchTerm,
-        favoritedByUsername: favoritedByUsername,
-      );
-// 3
-      yield freshPage;
-    } else {
-      final isFilteringByFavorites = favoritedByUsername != null;
-      final cachedPage = await _localStorage.getQuoteListPage(
-        pageNumber,
-// 1
-        isFilteringByFavorites,
-      );
-      final isFetchPolicyCacheAndNetwork =
-          fetchPolicy == QuoteListPageFetchPolicy.cacheAndNetwork;
-      final isFetchPolicyCachePreferably =
-          fetchPolicy == QuoteListPageFetchPolicy.cachePreferably;
-
-// 2
-      final shouldEmitCachedPageInAdvance =
-          isFetchPolicyCachePreferably || isFetchPolicyCacheAndNetwork;
-      if (shouldEmitCachedPageInAdvance && cachedPage != null) {
-// 3
-        yield cachedPage.toDomainModel();
-// 4
-        if (isFetchPolicyCachePreferably) {
-          return;
-        }
-      }
-// TODO: Call the remote API.
-    }
-  }
-
-  Future<QuoteListPage> _getQuoteListPageFromNetwork(
-    int pageNumber, {
-    Tag? tag,
-    String searchTerm = '',
-    String? favoritedByUsername,
-  }) async {
-    try {
-// 2
-      final apiPage = await remoteApi.getQuoteListPage(
-        pageNumber,
-        tag: tag?.toRemoteModel(),
-        searchTerm: searchTerm,
-        favoritedByUsername: favoritedByUsername,
-      );
-      final isFiltering = tag != null || searchTerm.isNotEmpty;
-      final favoritesOnly = favoritedByUsername != null;
-      final shouldStoreOnCache = !isFiltering;
-// 3
-      if (shouldStoreOnCache) {
-// 4
-        final shouldEmptyCache = pageNumber == 1;
-        if (shouldEmptyCache) {
-          await _localStorage.clearQuoteListPageList(favoritesOnly);
-        }
-        final cachePage = apiPage.toCacheModel();
-        await _localStorage.upsertQuoteListPage(
-          pageNumber,
-          cachePage,
-          favoritesOnly,
-        );
-      }
-      final domainPage = apiPage.toDomainModel();
-      return domainPage;
-    } on EmptySearchResultFavQsException catch (_) {
-      throw EmptySearchResultException();
-    }
+    throw UnimplementedError();
   }
 
   Future<Quote> getQuoteDetails(int id) async {
