@@ -1,8 +1,8 @@
 import 'package:component_library/component_library.dart';
 import 'package:flutter/material.dart';
 
-class SearchBar extends StatelessWidget {
-  const SearchBar({
+class SearchBar2 extends StatelessWidget {
+  const SearchBar2({
     this.controller,
     this.onChanged,
     Key? key,

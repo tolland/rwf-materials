@@ -49,6 +49,21 @@ upgrade:
 		cd ../../ ; \
 	done
 
+outdated:
+	flutter pub outdated
+	for feature in $(FEATURES); do \
+		cd $${feature} ; \
+		echo "Outdated dependencies on $${feature}" ; \
+		flutter pub outdated ; \
+		cd ../../../ ; \
+	done
+	for package in $(PACKAGES); do \
+		cd $${package} ; \
+		echo "outdated dependencies on $${package}" ; \
+		flutter pub outdated ; \
+		cd ../../ ; \
+	done
+
 lint:
 	flutter analyze
 
